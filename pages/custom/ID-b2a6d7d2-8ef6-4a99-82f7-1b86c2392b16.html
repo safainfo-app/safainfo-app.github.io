@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <title>Compleanni e memorie defunti</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        canvas {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+        }
+        .pdf-container {
+            padding: 10px;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        @media (max-width: 600px) {
+            canvas {
+                width: 100% !important;
+            }
+        }
+    </style>
+    <script>
+        window.onload = function() {
+            // Mapping of months to page numbers
+            const monthsToPages = {
+                1: 1,    // January
+                2: 2,    // February
+                3: 4,    // March
+                4: 6,    // April
+                5: 7,    // May
+                6: 9,    // June
+                7: 10,   // July
+                8: 12,   // August
+                9: 13,   // September
+                10: 15,  // October
+                11: 16,  // November
+                12: 17   // December
+            };
+
+            // Get the current month (1-12)
+            const currentMonth = new Date().getMonth() + 1;
+
+            // Get the page number for the current month
+            const startPageNumber = monthsToPages[currentMonth];
+
+            // PDF URL (ensure it’s cached in the PWA's service worker for offline use)
+            const pdfUrl = '/pages/custom/VIVOS_Y_DIFUNTOS_2024.pdf';
+
+            // Function to load and render the PDF using PDF.js
+            function loadPDF(pdfUrl) {
+                pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
+                    // Function to render each page
+                    function renderPage(pageNumber) {
+                        pdf.getPage(pageNumber).then(function(page) {
+                            const scale = 1.5;  // Adjust scale for better clarity
+                            const viewport = page.getViewport({ scale: scale });
+
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            document.getElementById('pdfContainer').appendChild(canvas); // Add canvas to the container
+
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            // Render the page into the canvas context
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            });
+                        });
+                    }
+
+                    // Render all pages
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        renderPage(i);
+                    }
+
+                    // Scroll to the current month's page after rendering
+                    setTimeout(() => {
+                        const pageToScroll = startPageNumber - 1; // Adjust for 0-based index
+                        const targetCanvas = document.querySelectorAll('canvas')[pageToScroll];
+                        if (targetCanvas) {
+                            targetCanvas.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }, 1000); // Delay to ensure rendering is completed
+                }).catch(function(error) {
+                    console.error('Error loading PDF: ', error);
+                });
+            }
+
+            // Check if the PDF is available in the cache (using service worker caching)
+            if ('caches' in window) {
+                caches.match(pdfUrl).then(function(response) {
+                    if (response) {
+                        console.log("Using cached PDF...");
+                        loadPDF(response); // Load from cache
+                    } else {
+                        console.log("Fetching PDF from the network...");
+                        loadPDF(pdfUrl); // Load from network
+                    }
+                });
+            }
+
+        };
+    </script>
+</head>
+<body>
+    <h2>Compleanni e memorie defunti</h2>
+    <div class="pdf-container" id="pdfContainer">
+        <!-- Canvas elements will be appended here -->
+    </div>
+    <footer id="sticky-footer">
+        <button id="back-button">Indietro</button>
+    </footer>
+    <script src="/main.js"></script>
+</body>
+</html>

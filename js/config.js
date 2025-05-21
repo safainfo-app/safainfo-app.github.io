@@ -14,8 +14,8 @@ const config = {
     pagesTable: "https://docs.google.com/spreadsheets/d/1SWsSN6AtrsibtLpXBujNytp6fXkicCPO4IzvKYsaT3c/export?format=csv",
     deletedTable: "https://docs.google.com/spreadsheets/d/11Rm1TlXhd83oFcDuLr_S58N_6utNPzZh8QfjTXf_jZc/export?format=csv",
     deletionEntryId: 'entry.1372900842',
-    creationFormIdHsh: '822cefd8fbee2e592919a29708bab929a84d1ce0', //SHA1 Hash
-    deletionFormIdHash: 'fab33b18a44810eae7bba397c049b7de514894a5' //SHA1 Hash
+    creationFormIdHsh: 'b683f3adcff92e6c5505e51ac361ee18a1c91e7e', //SHA1 Hash
+    deletionFormIdHash: '58e08659a8b37baa805278a5f2f3c7a302b1c83a' //SHA1 Hash
 };
 
 export default config;

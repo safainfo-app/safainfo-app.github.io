@@ -1,7 +1,7 @@
 {
-  "name": "SA.FA.",
-  "short_name": "SA.FA.",
-  "description": "Provincia S.Anna e Madonna di Loreto FSF",
+  "name": "Nuova app",
+  "short_name": "Nuova app",
+  "description": "Nuova app",
   "start_url": ".",
   "display": "standalone",
   "icons": [

@@ -1,7 +1,7 @@
-const CACHE_NAME = 'safa-cache-v64';
+const CACHE_NAME = 'safa-cache-v65';
 const EXCLUDE_FROM_CACHE = [
-    "https://docs.google.com/spreadsheets/d/1ZuUVyBmIU_Ax5V7Iq-yCUQvN-tmF8RZEh1uhkT6HVFA/export?format=csv",
-    "https://docs.google.com/spreadsheets/d/1FVN90zGMNJbKOiBJWCVdVH7UFI74yny4G-3vJBzwrEo/export?format=csv"
+    "https://docs.google.com/spreadsheets/d/1SWsSN6AtrsibtLpXBujNytp6fXkicCPO4IzvKYsaT3c/export?format=csv",
+    "https://docs.google.com/spreadsheets/d/11Rm1TlXhd83oFcDuLr_S58N_6utNPzZh8QfjTXf_jZc/export?format=csv"
 ];
 
 // Install event to cache the pages and assets

@@ -152,25 +152,25 @@ h2, h3 {
 #goButton {
     font-weight: bold;
     font-size: 18px;
-    background-color: #F0C36D; /* Light Gold */
-    border-color: #BD4B26; /* Tuscany */
-    color: #333333; /* Dark Charcoal for text */
+    background-color: #F7A7C4; /* Rose Petal Pink */
+    border-color: #6F4F2A; /* Earthy Brown */
+    color: #4C2A5A; /* Deep Plum (Contrast Text) */
 }
 
 #installButton {
-    background-color: #F0C36D; /* Light Gold */
-    border-color: #BD4B26; /* Tuscany */
-    color: #333333; /* Dark Charcoal for text */
+    background-color: #F1D0A1; /* Light Peach */
+    border-color: #6E4B3C; /* Warm Earth Brown */
+    color: #5D4C42; /* Warm Charcoal */
 }
 
 /* Disabled state for 'Go' button */
 #goButton:disabled {
-    background-color: #d6d6d6; /* Light grey background to show it's disabled */
-    border-color: #b3b3b3; /* Lighter border */
-    color: #5a5a5a; /* Lighter text color */
-    cursor: not-allowed; /* Change cursor to indicate it's not clickable */
-    box-shadow: none; /* Remove any box-shadow */
-    transform: none; /* Remove the transform effect */
+    background-color: #F0D3D3; /* Very Soft Pink */
+    border-color: #B0A9A1; /* Muted Brownish Grey */
+    color: #A8A8A8; /* Soft Grey */
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 /* --------------------------------------------- */

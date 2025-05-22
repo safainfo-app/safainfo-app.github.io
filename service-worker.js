@@ -1,4 +1,4 @@
-const CACHE_NAME = 'safa-cache-v69';
+const CACHE_NAME = 'safa-cache-v70';
 const EXCLUDE_FROM_CACHE = [
     "https://docs.google.com/spreadsheets/d/1SWsSN6AtrsibtLpXBujNytp6fXkicCPO4IzvKYsaT3c/export?format=csv",
     "https://docs.google.com/spreadsheets/d/11Rm1TlXhd83oFcDuLr_S58N_6utNPzZh8QfjTXf_jZc/export?format=csv"
@@ -16,7 +16,7 @@ self.addEventListener('install', (event) => {
                 '/pages/single-item.html',
                 '/styles.css',
                 '/main.js',
-                '/images/logoSAFA.png',
+                '/images/logo.webp',
                 'js/index.js',
                 'js/items.js',
                 'js/single-item.js',

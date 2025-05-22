@@ -1,7 +1,7 @@
 {
-  "name": "Nuova app",
-  "short_name": "Nuova app",
-  "description": "Nuova app",
+  "name": "Semplicemente Fiori",
+  "short_name": "Semplicemente Fiori",
+  "description": "Di Antonella Muscolino",
   "start_url": ".",
   "display": "standalone",
   "icons": [

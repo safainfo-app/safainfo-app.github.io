@@ -1,4 +1,4 @@
-const CACHE_NAME = 'safa-cache-v71';
+const CACHE_NAME = 'safa-cache-v72';
 const EXCLUDE_FROM_CACHE = [
     "https://docs.google.com/spreadsheets/d/1SWsSN6AtrsibtLpXBujNytp6fXkicCPO4IzvKYsaT3c/export?format=csv",
     "https://docs.google.com/spreadsheets/d/11Rm1TlXhd83oFcDuLr_S58N_6utNPzZh8QfjTXf_jZc/export?format=csv"

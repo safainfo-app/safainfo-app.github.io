@@ -101,7 +101,7 @@ h2, h3 {
 /* --------------------------------------------- */
 /* First container (logo) takes 20% of the height */
 .logo-container {
-    height: 30%; 
+    height: 10%; 
     display: flex;
     justify-content: flex-end;  /* Aligns logo to the right */
     align-items: center;  /* Vertically centers the logo */
@@ -123,7 +123,7 @@ h2, h3 {
 
 /* --------------------------------------------- */
 .central-image-container {
-    height: 40%;
+    height: 60%;
     display: flex;
     justify-content: center;  /* Centers the image horizontally */
     align-items: center;  /* Centers the image vertically */
@@ -152,26 +152,27 @@ h2, h3 {
 #goButton {
     font-weight: bold;
     font-size: 18px;
-    background-color: #F7A7C4; /* Rose Petal Pink */
-    border-color: #6F4F2A; /* Earthy Brown */
-    color: #4C2A5A; /* Deep Plum (Contrast Text) */
+    background-color: #2E7D32; /* Dark Green */
+    border-color: #1B4D23;     /* Deep Forest Green */
+    color: #C8E6C9;            /* Mint Green (contrast text) */
 }
 
 #installButton {
-    background-color: #F1D0A1; /* Light Peach */
-    border-color: #6E4B3C; /* Warm Earth Brown */
-    color: #5D4C42; /* Warm Charcoal */
+    background-color: #81C784; /* Medium Mint Green */
+    border-color: #4A774D;     /* Olive Green */
+    color: #2E4A1F;            /* Dark Moss Green */
 }
 
 /* Disabled state for 'Go' button */
 #goButton:disabled {
-    background-color: #F0D3D3; /* Very Soft Pink */
-    border-color: #B0A9A1; /* Muted Brownish Grey */
-    color: #A8A8A8; /* Soft Grey */
+    background-color: #A5D6A7; /* Light Mint */
+    border-color: #7C9E7C;     /* Muted Olive */
+    color: #A8A8A8;            /* Soft Grey */
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
 }
+
 
 /* --------------------------------------------- */
 /* --------------------------------------------- */

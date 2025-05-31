@@ -55,11 +55,20 @@ main {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: white;
+    background-color: #f5fdf6;
     text-align: center;
     padding: 10px 0;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Adds shadow on top of the footer for separation */
 }
+
+#back-button {
+    font-weight: bold;
+    font-size: 18px;
+    background-color: #2E7D32; /* Dark Green */
+    border-color: #1B4D23;     /* Deep Forest Green */
+    color: #C8E6C9;            /* Mint Green (contrast text) */
+}
+
 
 h2, h3 {
     text-align: center;
@@ -255,6 +264,7 @@ a:hover {
     padding: 15px; /* Add padding for better spacing */
     word-wrap: break-word; /* Ensure long text doesn't overflow */
     overflow-wrap: break-word; /* Support for modern browsers */
+    background-color: #f5fdf6; /* Very light green */
 }
 
 /* Responsive adjustments for smaller screens */
@@ -323,19 +333,6 @@ body.items-page #items-list-container {
     color: #3d483e;
     padding: 10px;  /* Optional: Add padding for better spacing */
     margin-bottom: 150px;
-}
-
-/* Footer with the 'Back' button */
-body.items-page #sticky-footer {
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #e6f1e4; /* Subtle minty pastel */
-    color: #3d483e;
-    text-align: center;
-    padding: 15px;
-    z-index: 1000;
-    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.5); /* Slight shadow for the footer */
 }
 
 /* Add styles for list items to maintain consistency */

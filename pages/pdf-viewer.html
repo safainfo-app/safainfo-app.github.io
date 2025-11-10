@@ -1,115 +1,21 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Visualizzatore PDF</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        .pdf-container { padding: 10px; width: 100%; overflow-x: hidden; }
-        canvas { display: block; margin: 8px auto; max-width: 100%; }
-        #controls { padding: 8px; display:flex; gap:8px; align-items:center; justify-content:flex-start; }
-    </style>
 </head>
-<body>
-    <div id="controls">
-        <span id="doc-info"></span>
+<body class="items-page">
+    <div id="items-list-container">
+        <!-- The list of items will be populated here -->
     </div>
-    <div class="pdf-container" id="pdfContainer"></div>
-
-    <footer id="sticky-footer">
-        <button id="back-button-footer">Indietro</button>
-    </footer>
-
-    <script>
-        // Utility: read query params
-        function qp(name) {
-            return new URLSearchParams(window.location.search).get(name);
-        }
-
-        const pdfUrl = qp('url');
-        const targetPageParam = parseInt(qp('page'), 10); // optional page to scroll to (1-based)
-        if (!pdfUrl) {
-            document.getElementById('doc-info').textContent = 'Nessun PDF specificato';
-            console.error('No PDF url provided in query param "url".');
-        } else {
-            document.getElementById('doc-info').textContent = 'Caricamento PDF...';
-            loadAndRenderPdf(decodeURIComponent(pdfUrl));
-        }
-
-        // Back buttons - only footer button now
-        document.querySelectorAll('#back-button-footer').forEach(btn => {
-            btn.addEventListener('click', () => history.back());
-        });
-
-        function loadAndRenderPdf(url) {
-            // Try to use cache if available
-            function startLoading(actualUrl) {
-                pdfjsLib.getDocument(actualUrl).promise.then(function(pdf) {
-                    const container = document.getElementById('pdfContainer');
-                    document.getElementById('doc-info').textContent = `Pagine: ${pdf.numPages}`;
-                    container.innerHTML = '';
-                    const renderPromises = [];
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        renderPromises.push(pdf.getPage(i).then(page => {
-                            // Compute a logical scale to fit the container width
-                            const unscaledViewport = page.getViewport({ scale: 1 });
-                            const containerWidth = container.clientWidth || window.innerWidth;
-                            const baseScale = Math.min(1.8, (containerWidth / unscaledViewport.width)); // cap max scale
-                            const viewport = page.getViewport({ scale: baseScale });
-
-                            // Use devicePixelRatio to create a higher-resolution canvas for crisp text
-                            const outputScale = Math.max(1, Math.min(window.devicePixelRatio || 1, 2)); // cap to 2 for perf
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-
-                            // Set actual pixel size multiplied by outputScale, but keep CSS size at logical dimensions
-                            canvas.width = Math.floor(viewport.width * outputScale);
-                            canvas.height = Math.floor(viewport.height * outputScale);
-                            canvas.style.width = `${Math.floor(viewport.width)}px`;
-                            canvas.style.height = `${Math.floor(viewport.height)}px`;
-
-                            // Scale the context so drawing commands are scaled up to the higher pixel density
-                            ctx.setTransform(outputScale, 0, 0, outputScale, 0, 0);
-
-                            container.appendChild(canvas);
-                            return page.render({ canvasContext: ctx, viewport }).promise.then(() => canvas);
-                        }));
-                    }
-
-                    // After all pages are rendered, do NOT perform any automatic scrolling
-                    Promise.all(renderPromises).then(canvases => {
-                        // Rendering complete. Keep current scroll position (no automatic scrolling).
-                        // Optionally you can focus the viewer or update status:
-                        document.getElementById('doc-info').textContent = `Pagine: ${pdf.numPages} — Caricamento completato`;
-                    });
-                }).catch(err => {
-                    console.error('Errore nel caricamento del PDF', err);
-                    document.getElementById('doc-info').textContent = 'Errore nel caricamento del PDF';
-                });
-            }
-
-            if ('caches' in window) {
-                try {
-                    caches.match(url).then(resp => {
-                        if (resp) {
-                            resp.blob().then(blob => {
-                                // Create object URL from cached blob for PDF.js
-                                const objectUrl = URL.createObjectURL(blob);
-                                startLoading(objectUrl);
-                            }).catch(() => startLoading(url));
-                        } else {
-                            startLoading(url);
-                        }
-                    }).catch(() => startLoading(url));
-                } catch (e) {
-                    startLoading(url);
-                }
-            } else {
-                startLoading(url);
-            }
-        }
-    </script>
+        <!-- Footer with the 'Back' button (sticky) -->
+        <footer id="sticky-footer">
+            <button id="back-button">Indietro</button>
+        </footer>
+    <script src="/main.js"></script>
+    <script type="module" src="/js/items.js"></script>
 </body>
 </html>

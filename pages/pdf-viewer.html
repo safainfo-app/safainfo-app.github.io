@@ -1,21 +1,162 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagine</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Visualizzatore PDF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .pdf-container { padding: 10px; width: 100%; overflow-x: hidden; }
+        canvas { display: block; margin: 8px auto; max-width: 100%; }
+        #controls { padding: 8px; display:flex; gap:8px; align-items:center; justify-content:flex-start; }
+    </style>
 </head>
-<body class="items-page">
-    <div id="items-list-container">
-        <!-- The list of items will be populated here -->
+<body>
+    <div id="controls">
+        <span id="doc-info"></span>
     </div>
-        <!-- Footer with the 'Back' button (sticky) -->
-        <footer id="sticky-footer">
-            <button id="back-button">Indietro</button>
-        </footer>
-    <script src="/main.js"></script>
-    <script type="module" src="/js/items.js"></script>
+    <div class="pdf-container" id="pdfContainer"></div>
+
+    <footer id="sticky-footer">
+        <button id="back-button-footer">Indietro</button>
+    </footer>
+
+    <script>
+        // Utility: read query params
+        function qp(name) {
+            return new URLSearchParams(window.location.search).get(name);
+        }
+
+        const pdfUrl = qp('url');
+        const targetPageParam = parseInt(qp('page'), 10); // optional page to scroll to (1-based)
+        if (!pdfUrl) {
+            document.getElementById('doc-info').textContent = 'Nessun PDF specificato';
+            console.error('No PDF url provided in query param "url".');
+        } else {
+            document.getElementById('doc-info').textContent = 'Caricamento PDF...';
+            loadAndRenderPdf(decodeURIComponent(pdfUrl));
+        }
+
+        // Back buttons - only footer button now
+        document.querySelectorAll('#back-button-footer').forEach(btn => {
+            btn.addEventListener('click', () => history.back());
+        });
+
+        function loadAndRenderPdf(url) {
+            // Try to use cache if available
+            function startLoading(actualUrl) {
+                pdfjsLib.getDocument(actualUrl).promise.then(function(pdf) {
+                    const container = document.getElementById('pdfContainer');
+                    document.getElementById('doc-info').textContent = `Pagine: ${pdf.numPages}`;
+                    container.innerHTML = '';
+
+                    // Precompute day and regex:
+                    const day = new Date().getDate();
+                    const dayStr = String(day);
+                    const dayPadded = day < 10 ? '0' + day : dayStr;
+                    // weekday abbreviations (italian) — we ignore spaces/special chars by normalizing text
+                    const weekdayPattern = '(?:lun|mar|mer|gio|ven|sab|dom)';
+                    const combinedRegex = new RegExp(`(?:${dayStr}|${dayPadded})${weekdayPattern}`, 'i');
+
+                    let matchedPage = null;
+                    const renderPromises = [];
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        renderPromises.push(pdf.getPage(i).then(async page => {
+                            // --- analyze page text for the day+weekday pattern ---
+                            try {
+                                const textContent = await page.getTextContent();
+                                const rawText = textContent.items.map(it => it.str).join('');
+                                // Normalize: remove non-alphanumeric characters and lowercase
+                                const normalized = rawText.replace(/[^a-z0-9]/gi, '').toLowerCase();
+                                // If not yet matched, test the normalized text
+                                if (!matchedPage && combinedRegex.test(normalized)) {
+                                    matchedPage = i;
+                                    console.log('Trovata corrispondenza per il giorno alla pagina', i);
+                                }
+                            } catch (e) {
+                                // Non tutte le pagine possono fornire testo; ignoriamo errori di estrazione
+                                console.warn('Impossibile estrarre testo dalla pagina', i, e);
+                            }
+
+                            // --- render page to canvas (preserve existing rendering behavior) ---
+                            const unscaledViewport = page.getViewport({ scale: 1 });
+                            const containerWidth = container.clientWidth || window.innerWidth;
+                            const baseScale = Math.min(1.8, (containerWidth / unscaledViewport.width));
+                            const viewport = page.getViewport({ scale: baseScale });
+
+                            const outputScale = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+
+                            canvas.width = Math.floor(viewport.width * outputScale);
+                            canvas.height = Math.floor(viewport.height * outputScale);
+                            canvas.style.width = `${Math.floor(viewport.width)}px`;
+                            canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+                            ctx.setTransform(outputScale, 0, 0, outputScale, 0, 0);
+
+                            // Don't append canvas here - wait until all are rendered
+                            return page.render({ canvasContext: ctx, viewport }).promise.then(() => ({ canvas, pageNumber: i }));
+                        }));
+                    }
+
+                    // After all pages are rendered, append them in correct order
+                    Promise.all(renderPromises).then(results => {
+                        // Sort results by page number to ensure correct order
+                        results.sort((a, b) => a.pageNumber - b.pageNumber);
+                        
+                        // Now append canvases in the correct order
+                        results.forEach(result => {
+                            container.appendChild(result.canvas);
+                        });
+
+                        document.getElementById('doc-info').textContent = `Pagine: ${pdf.numPages} — Caricamento completato`;
+
+                        // Prefer explicit ?page= param; otherwise use matchedPage if found
+                        let pageToScroll = null;
+                        if (!isNaN(targetPageParam) && targetPageParam >= 1 && targetPageParam <= pdf.numPages) {
+                            pageToScroll = targetPageParam;
+                        } else if (matchedPage) {
+                            pageToScroll = matchedPage;
+                        }
+
+                        if (pageToScroll) {
+                            const target = results.find(r => r.pageNumber === pageToScroll);
+                            if (target && target.canvas) {
+                                // Scroll so the chosen page's canvas is at top of viewport
+                                target.canvas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }
+                    }).catch(err => {
+                        console.error('Errore durante il rendering delle pagine', err);
+                    });
+                }).catch(err => {
+                    console.error('Errore nel caricamento del PDF', err);
+                    document.getElementById('doc-info').textContent = 'Errore nel caricamento del PDF';
+                });
+            }
+
+            if ('caches' in window) {
+                try {
+                    caches.match(url).then(resp => {
+                        if (resp) {
+                            resp.blob().then(blob => {
+                                // Create object URL from cached blob for PDF.js
+                                const objectUrl = URL.createObjectURL(blob);
+                                startLoading(objectUrl);
+                            }).catch(() => startLoading(url));
+                        } else {
+                            startLoading(url);
+                        }
+                    }).catch(() => startLoading(url));
+                } catch (e) {
+                    startLoading(url);
+                }
+            } else {
+                startLoading(url);
+            }
+        }
+    </script>
 </body>
 </html>
